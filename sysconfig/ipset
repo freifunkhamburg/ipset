@@ -1,0 +1,45 @@
+create transit_IPv4_tmp hash:net family inet hashsize 1024 maxelem 65536 counters
+add transit_IPv4_tmp 185.117.213.0/24
+add transit_IPv4_tmp 185.66.192.0/22
+add transit_IPv4_tmp 193.96.224.0/24
+add transit_IPv4_tmp 77.87.48.0/21
+add transit_IPv4_tmp 185.161.128.0/22
+swap transit_IPv4_tmp transit_IPv4
+destroy transit_IPv4_tmp
+create reserved_IPv4_tmp hash:net family inet hashsize 1024 maxelem 65536 counters
+add reserved_IPv4_tmp 0.0.0.0/8
+add reserved_IPv4_tmp 10.0.0.0/8
+add reserved_IPv4_tmp 100.64.0.0/10
+add reserved_IPv4_tmp 127.0.0.0/8
+add reserved_IPv4_tmp 169.254.0.0/16
+add reserved_IPv4_tmp 172.16.0.0/12
+add reserved_IPv4_tmp 192.0.0.0/24
+add reserved_IPv4_tmp 192.0.2.0/24
+add reserved_IPv4_tmp 192.168.0.0/16
+add reserved_IPv4_tmp 198.18.0.0/15
+add reserved_IPv4_tmp 198.51.100.0/24
+add reserved_IPv4_tmp 203.0.113.0/24
+add reserved_IPv4_tmp 224.0.0.0/4
+add reserved_IPv4_tmp 240.0.0.0/4
+swap reserved_IPv4_tmp reserved_IPv4
+destroy reserved_IPv4_tmp
+create transit_IPv6_tmp hash:net family inet6 hashsize 1024 maxelem 65536 counters
+add transit_IPv6_tmp 2001:67c:2d50::/48
+add transit_IPv6_tmp 2001:bf7::/32
+add transit_IPv6_tmp 2a03:2260::/30
+add transit_IPv6_tmp 2a03:2267::/32
+add transit_IPv6_tmp 2a06:8782::/32
+add transit_IPv6_tmp 2001:67c:1550::/48
+add transit_IPv6_tmp 2a07:c480::/29
+swap transit_IPv6_tmp transit_IPv6
+destroy transit_IPv6_tmp
+create reserved_IPv6_tmp hash:net family inet6 hashsize 1024 maxelem 65536 counters
+add reserved_IPv6_tmp ::/96
+add reserved_IPv6_tmp 2001:10::/28
+add reserved_IPv6_tmp 2001:db8::/32
+add reserved_IPv6_tmp 3ffe::/16
+add reserved_IPv6_tmp fc00::/7
+add reserved_IPv6_tmp fec0::/10
+add reserved_IPv6_tmp ff00::/8
+swap reserved_IPv6_tmp reserved_IPv6
+destroy reserved_IPv6_tmp

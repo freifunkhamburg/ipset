@@ -1,0 +1,47 @@
+README for /etc/sysconfig/ipset
+-------------------------------
+
+ipset does not have a nice way like iptables-restore to restore them and before iptables loads the sets must be loaded already, otherwise iptables-restore will fail to restore the firewall settings.
+
+Thus there are some tricks used to allow safe update of ipsets.
+
+
+If you want to...
+
+... add a net to an existing ip set:
+1. Lookup the name of the existing ip set (e.g. transit_IPv4) and add _tmp to it: transit_IPv4_tmp
+2. Add a line similar to the following to /etc/sysconfig/ipset:
+	add transit_IPv4_tmp 185.117.213.0/24
+3. Run the following command (this restarts iptables):
+	# systemctl restart ipset
+4. Run the following command to verify that the net has been added, but use the real name of the set:
+	# ipset list transit_IPv4
+You're done.
+
+
+... create a new ip set:
+1. Think of a new sensible name (e.g. reserved_IPv4)
+2. If the structure of the set is exactly the same as an existing set, you can skip to step 3 and just copy the lines from an existing set, otherwise:
+	a. Use "ipset create" (man ipset) to create the set and "ipset add" to add one entry
+	b. Run "ipset save" (displays to stdout) and copy the lines to create your new set and add the first entry
+3. Update /etc/systemd/system/ipset.service...
+	a. by adding a new line (obviously use the name of your set and add "family inet6" if it's IPv6):
+		ExecStartPre=-/sbin/ipset create reserved_IPv4 hash:net
+	b. and adding a new line with the name of your set with an added _tmp at the end:
+		ExecStartPre=-/sbin/ipset destroy reserved_IPv4_tmp
+	c. Run the following command:
+		# systemctl daemon-reload
+4. Update /etc/sysconfig/ipset...
+	a. by adding a create line for your set with an added _tmp at the end:
+		create reserved_IPv4_tmp hash:net family inet hashsize 1024 maxelem 65536 counters
+	b. by adding the add line for your set with an added _tmp at the end:
+		add reserved_IPv4_tmp 240.0.0.0/4
+	c. by adding a swap line for your set first with an added _tmp then without the _tmp:
+		swap reserved_IPv4_tmp reserved_IPv4
+	d. by adding a destroy line for the set with _tmp at the end:
+		destroy reserved_IPv4_tmp
+5. Run the following command (this restarts iptables):
+	# systemctl restart ipset
+6. Run the following command to verify that the set has been added, but use the real name of the set:
+	# ipset list transit_IPv4
+You're done.

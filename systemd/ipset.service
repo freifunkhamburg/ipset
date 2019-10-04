@@ -1,0 +1,24 @@
+[Unit]
+Description=Loads ip sets for iptables from /etc/sysconfig/ipset
+Before=iptables.service ip6tables.service
+After=syslog.target
+AssertPathExists=/etc/sysconfig/ipset
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=-/sbin/ipset create transit_IPv4 hash:net
+ExecStartPre=-/sbin/ipset destroy transit_IPv4_tmp
+ExecStartPre=-/sbin/ipset create reserved_IPv4 hash:net
+ExecStartPre=-/sbin/ipset destroy reserved_IPv4_tmp
+ExecStartPre=-/sbin/ipset create transit_IPv6 hash:net family inet6
+ExecStartPre=-/sbin/ipset destroy transit_IPv6_tmp
+ExecStartPre=-/sbin/ipset create reserved_IPv6 hash:net family inet6
+ExecStartPre=-/sbin/ipset destroy reserved_IPv6_tmp
+ExecStart=/bin/sh -c "/sbin/ipset restore < /etc/sysconfig/ipset"
+ExecStop=/sbin/ipset destroy
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+RequiredBy=iptables.service ip6tables.service

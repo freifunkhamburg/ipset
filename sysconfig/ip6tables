@@ -1,0 +1,23 @@
+# sample configuration for ip6tables service
+# you can edit this manually or use system-config-firewall
+# please do not ask us to add additional ports/services to this default configuration
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:fwd_ext_filter - [0:0]
+-A INPUT -p tcp -m tcp -s 2a00:14b0:4200:3380:134::1/128 --dport 9000:9999 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 9000:9999 -j DROP
+-A FORWARD -d fec0:0:0:ffff::/64 -j ACCEPT
+-A FORWARD -i eno2 -j fwd_ext_filter
+-A FORWARD -i eno50.+ -j fwd_ext_filter
+-A FORWARD -i ens2d1.+ -j fwd_ext_filter
+-A FORWARD -o eno2 -j fwd_ext_filter
+-A FORWARD -o eno50.+ -j fwd_ext_filter
+-A FORWARD -o ens2d1.+ -j fwd_ext_filter
+-A fwd_ext_filter -m set --match-set reserved_IPv6 dst -j DROP
+-A fwd_ext_filter -m set --match-set reserved_IPv6 src -j DROP
+#-A fwd_ext_filter -m set --match-set transit_IPv6 dst -j ACCEPT
+#-A fwd_ext_filter -m set --match-set transit_IPv6 src -j ACCEPT
+-A fwd_ext_filter -j ACCEPT
+COMMIT

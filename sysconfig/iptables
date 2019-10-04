@@ -1,0 +1,40 @@
+# sample configuration for iptables service
+# you can edit this manually or use system-config-firewall
+# please do not ask us to add additional ports/services to this default configuration
+#
+# WARNING: DO NOT ACTIVATE ANY KIND OF LOGGING, LOGGING KILLS THE SERVER
+#
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:fwd_ext_filter - [0:0]
+-A INPUT -p tcp -m tcp --dport ssh -d 193.96.224.249 -j DROP
+-A INPUT -p udp -m udp --dport 53 -j DROP
+-A INPUT -p tcp -m tcp --dport 5000 -s 193.96.224.250 -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 5000 -j DROP
+-A INPUT -p tcp -m tcp --dport 9000:9999 -j DROP
+-A INPUT -j ACCEPT
+#-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+#-A INPUT -p icmp -j ACCEPT
+#-A INPUT -i lo -j ACCEPT
+#-A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
+#-A INPUT -j REJECT --reject-with icmp-host-prohibited
+-A FORWARD -s 10.112.0.0/16 -d 10.112.0.0/16 ! -o eno50.310 -j ACCEPT
+-A FORWARD -s 100.64.112.0/24 -d 10.112.0.0/16 ! -o eno50.310 -j ACCEPT
+-A FORWARD -i eno2 -j fwd_ext_filter
+-A FORWARD -i eno50.+ -j fwd_ext_filter
+-A FORWARD -i ens2d1.+ -j fwd_ext_filter
+-A FORWARD -o eno2 -j fwd_ext_filter
+-A FORWARD -o eno50.+ -j fwd_ext_filter
+-A FORWARD -o ens2d1.+ -j fwd_ext_filter
+-A fwd_ext_filter -m set --match-set reserved_IPv4 src -j DROP
+-A fwd_ext_filter -m set --match-set reserved_IPv4 dst -j DROP
+-A fwd_ext_filter -j ACCEPT
+#-A fwd_ext_filter -m set --match-set transit_IPv4 src -j ACCEPT
+#-A fwd_ext_filter -m set --match-set transit_IPv4 dst -j ACCEPT
+# DO NOT ACTIVATE THE NEXT LINE, IT KILLS THE SERVER
+#-A fwd_ext_filter -j LOG --log-prefix drop_log
+# DO NOT ACTIVATE THE PREVIOUS LINE, IT KILLS THE SERVER
+#-A fwd_ext_filter -j DROP
+COMMIT
